@@ -1,49 +1,28 @@
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-
-module.exports = (env, options) => {
-  return {
-    entry: './src/main.tsx',
-    target: 'web',
-    mode: 'development',
-    watch: true,
-    module: {
-      rules: [
-        {
-          test: /\.tsx?$/,
-          use: 'ts-loader',
-          exclude: /node_modules/,
+const swcConfig = require('./.swcrc');
+module.exports = {
+  entry: './src/main.tsx',
+  output: {
+    path: path.resolve(__dirname, 'build'),
+    filename: 'bundle.js',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.(js|jsx|tsx|ts)$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'swc-loader',
+          options: swcConfig,
         },
-        {
-          test: /\.scss$/,
-          use: [
-            'style-loader',
-            'css-loader',
-            {
-              loader: 'postcss-loader',
-              options: {
-                postcssOptions: {
-                  plugins: [['postcss-preset-env']],
-                },
-              },
-            },
-            'sass-loader',
-          ],
-        },
-      ],
-    },
-    resolve: { extensions: ['.tsx', '.ts', '.js'] },
-    output: {
-      filename: 'main.bundle.js',
-      path: path.resolve(__dirname, 'dist'),
-      publicPath: "",
-    },
-    plugins: [
-      new HtmlWebpackPlugin({
-        template: './src/index.html',
-        inject: true,
-        minify: false,
-      }),
+      },
     ],
-  };
+  },
+  devServer: {
+    contentBase: path.resolve(__dirname, 'public'),
+    port: 3000,
+    publicPath: '/build/',
+    open: true,
+    overlay: true,
+  },
 };
